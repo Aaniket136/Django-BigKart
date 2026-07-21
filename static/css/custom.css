@@ -55,24 +55,23 @@ ul.thumb li img {
     height: 80px;
     border: 1px solid grey;
 }
-/* Text Logo Styling */
-/* Text Logo Styling (Bigger Version) */
+
 .brand-logo-text {
-    font-size: 36px; /* Size ko 26px se badha kar 36px kar diya */
-    font-weight: 900; /* Ekdum heavy bold bold look */
+    font-size: 36px; 
+    font-weight: 900;
     font-family: sans-serif;
     text-decoration: none; 
-    letter-spacing: -1px; /* Badhe size par text tight aur mast dikhega */
+    letter-spacing: -1px; 
     display: inline-block;
     vertical-align: middle;
-    line-height: 1; /* Faltu vertical space hatane ke liye */
+    line-height: 1; 
 }
-/* "Big" ka perfect blue color */
+
 .brand-blue {
     color: #3b82f6; 
 }
 
-/* "Kart" ka dark grey color jo white header par mast khilega */
+
 .brand-grey {
     color: #475569; 
 }

@@ -1,13 +1,30 @@
 {% if messages %}
-
     {% for message in messages %}
-    <div id="message" class="container">
-    <div {% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %} role="alert">
-        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
-        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Error: {% endif %}
-        {{ message }}
-    </div>
+    <div id="message" class="container" style="transition: all 0.5s ease-in-out;">
+        <div {% if message.tags %} class="alert alert-{{ message.tags }}" {% endif %} role="alert">
+            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                <strong>Error: </strong>
+            {% endif %}
+            {{ message }}
+        </div>
     </div>
     {% endfor %}
 
+    <!-- Auto-dismiss Script -->
+    <script>
+        // Page load hone ke baad 4000 milliseconds (4 seconds) ka wait karega
+        setTimeout(function() {
+            var msgBox = document.getElementById('message');
+            if (msgBox) {
+                // Pehle thoda opacity kam karega (fade out effect)
+                msgBox.style.opacity = '0';
+                
+                // Opacity khatam hone ke baad element ko layout se poora hata dega
+                setTimeout(function() {
+                    msgBox.remove();
+                }, 500); // 0.5 second fade out animation ke liye
+            }
+        }, 4000); // Aap 4000 ki jagah time badha ya ghata sakte hain (e.g. 3000 = 3s)
+    </script>
 {% endif %}

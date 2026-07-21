@@ -1,9 +1,9 @@
-from django.shortcuts import get_object_or_404, render,redirect
-from.models import Product,ReviewRating,ProductGallery
+from django.shortcuts import get_object_or_404, render, redirect
+from .models import Product, ReviewRating, ProductGallery
 from category.models import Category
 from carts.models import CartItem
 from carts.views import _cart_id
-from django.core.paginator import EmptyPage,Paginator,PageNotAnInteger
+from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 from django.http import HttpResponse
 from django.db.models import Q
 from .forms import ReviewForm
@@ -14,23 +14,35 @@ from orders.models import OrderProduct
 def store(request, category_slug=None):
     categories = None
     products = None
-    if category_slug !=None:
+    
+    if category_slug != None:
         categories = get_object_or_404(Category, slug=category_slug)
         products = Product.objects.filter(category=categories, is_available=True)
-        paginator = Paginator(products,1)
-        page = request.GET.get('page')
-        paged_products = paginator.get_page(page)
-
-        product_count = products.count()
     else:
         products = Product.objects.all().filter(is_available=True).order_by('id')
-        paginator= Paginator(products,3)
-        page = request.GET.get('page')
-        paged_products =paginator.get_page(page)
-        product_count = products.count()
-    context ={
-        'products':paged_products,
-        'product_count':product_count,
+
+    # ================= PRICE FILTER LOGIC START =================
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+
+    if min_price:
+        products = products.filter(price__gte=min_price)
+    if max_price:
+        products = products.filter(price__lte=max_price)
+    # ================= PRICE FILTER LOGIC END =================
+
+    # Product count filtering ke baad nikalna sahi rehta hai
+    product_count = products.count()
+
+    # Pagination setup (ab yeh filtered products par chalega)
+    per_page = 1 if category_slug != None else 3
+    paginator = Paginator(products, per_page)
+    page = request.GET.get('page')
+    paged_products = paginator.get_page(page)
+
+    context = {
+        'products': paged_products,
+        'product_count': product_count,
     }
     return render(request, 'store/store.html', context)
 
@@ -66,17 +78,34 @@ def product_detail(request, category_slug, product_slug):
 
 
 def search(request):
-    products =None
+    products = None
+    product_count = 0
+    
     if 'keyword' in request.GET:
         keyword = request.GET['keyword']
         if keyword:
-            products = Product.objects.order_by('-created_at').filter(Q (description__icontains=keyword) | Q( product_name__icontains=keyword)| Q(category__category_name__icontains=keyword))
-            product_count = products.count()
-    context ={
-        'products':products,
-        'product_count':product_count,
+            products = Product.objects.order_by('-created_at').filter(
+                Q(description__icontains=keyword) | 
+                Q(product_name__icontains=keyword) | 
+                Q(category__category_name__icontains=keyword)
+            )
+
+    
+    if products:
+        min_price = request.GET.get('min_price')
+        max_price = request.GET.get('max_price')
+        if min_price:
+            products = products.filter(price__gte=min_price)
+        if max_price:
+            products = products.filter(price__lte=max_price)
+            
+        product_count = products.count()
+
+    context = {
+        'products': products,
+        'product_count': product_count,
     }
-    return render (request, 'store/store.html',context)
+    return render(request, 'store/store.html', context)
 
 def submit_review(request, product_id):
     url= request.META.get('HTTP_REFERER')
@@ -101,6 +130,3 @@ def submit_review(request, product_id):
                 data.save()
                 messages.success(request, 'Thank you! your review has been submitted.')
                 return redirect(url)
-
-
-
