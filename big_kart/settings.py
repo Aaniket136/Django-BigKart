@@ -136,15 +136,7 @@ STATICFILES_DIRS = [
     BASE_DIR / "big_kart" / "static",
 ]
 
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
-    },
-}
-
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 # MEDIA FILE CONFIGUARATION 
 
 MEDIA_URL = '/media/'

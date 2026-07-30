@@ -1,5 +1,5 @@
 // some scripts
-alert("script.js loaded");
+
 // jquery ready start
 $(document).ready(function() {
 	// jQuery code
